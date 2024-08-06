@@ -5,7 +5,8 @@ const {
   updateTrainEngine,
   deleteTrainEngine,
   getAllTrainEngines,
-  getTrainEngineById
+  getTrainEngineById,
+  getRealTimeData
 } = require('../controllers/TrainEnginesController');
 
 // Route to get all train engines
@@ -22,5 +23,8 @@ router.put('/:engine_id', updateTrainEngine);
 
 // Route to delete a train engine
 router.delete('/:engine_id', deleteTrainEngine);
+
+// Route to get real-time data for a specific train engine by ID
+router.get('/:engine_id/realtime', getRealTimeData);
 
 module.exports = router;
