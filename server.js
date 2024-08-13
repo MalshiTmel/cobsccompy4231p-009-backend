@@ -1,11 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors'); // Import the cors package
 
 const app = express();
 
 // Middleware
 app.use(bodyParser.json());
+app.use(cors()); // Use cors middleware
 
 // Connect to MongoDB
 const dbUri = 'mongodb+srv://MalshiTmel:bruiCE1228@railwayapplication.hb6cxx3.mongodb.net/RailwayDB?retryWrites=true&w=majority';

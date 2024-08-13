@@ -1,3 +1,4 @@
+// routes/TrainWithEngineRoute.js
 const express = require('express');
 const router = express.Router();
 const {
@@ -5,22 +6,29 @@ const {
   removeTrainFromEngine,
   modifyTrainWithEngine,
   fetchAllTrainWithEngines,
-  fetchTrainWithEngineById
+  fetchTrainWithEngineById,
+  fetchTrainWithEngineByTID
 } = require('../controllers/TrainWithEngineController');
 
-// Add a new TrainWithEngine
+// Create a new TrainWithEngine
 router.post('/', createTrainWithEngine);
 
-// Remove a TrainWithEngine (delete by ID)
-router.delete('/:fulltrain_id', removeTrainFromEngine);
+// Unassign engine (set EID to 'unassigned')
+router.patch('/unassign/:fulltrain_id', removeTrainFromEngine);
 
-// Modify a TrainWithEngine (by ID)
-router.put('/:fulltrain_id', modifyTrainWithEngine);
+// Modify a TrainWithEngine (update by TID)
+router.patch('/:fulltrain_id', modifyTrainWithEngine);
 
 // Retrieve all TrainWithEngines
 router.get('/', fetchAllTrainWithEngines);
 
 // Retrieve a single TrainWithEngine by ID
 router.get('/:fulltrain_id', fetchTrainWithEngineById);
+
+// Retrieve a single TrainWithEngine by TID
+router.get('/tid/:tid', fetchTrainWithEngineByTID);
+
+// Modify a TrainWithEngine (update by TID)
+router.patch('/:fulltrain_id', modifyTrainWithEngine);
 
 module.exports = router;

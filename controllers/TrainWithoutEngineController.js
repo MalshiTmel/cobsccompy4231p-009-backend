@@ -126,3 +126,20 @@ exports.getTrainWithoutEngineByTID = async (req, res) => {
     res.status(400).json({ error: 'Unable to retrieve train' });
   }
 };
+
+// Get all TrainsWithoutEngines by Route ID (RID)
+exports.getTrainsByRouteID = async (req, res) => {
+    const { route_id } = req.params;
+    try {
+      const trains = await TrainWithoutEngine.find({ RID: route_id });
+      if (trains.length === 0) {
+        console.warn('No trains found for route:', route_id);
+        return res.status(404).json({ error: 'No trains found for this route' });
+      }
+      res.json(trains);
+    } catch (error) {
+      console.error('Error retrieving trains by route ID:', error);
+      res.status(400).json({ error: 'Unable to retrieve trains' });
+    }
+  };
+  

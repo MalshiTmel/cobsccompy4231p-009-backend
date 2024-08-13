@@ -6,7 +6,8 @@ const {
   deleteTrainWithoutEngine,
   getAllTrainsWithoutEngines,
   getRealTimeData,
-  getTrainWithoutEngineByTID
+  getTrainWithoutEngineByTID,
+  getTrainsByRouteID
 } = require('../controllers/TrainWithoutEngineController');
 
 // Route for creating a TrainWithoutEngine
@@ -26,5 +27,9 @@ router.get('/:train_id/realtime', getRealTimeData);
 
 // Route for retrieving a specific TrainWithoutEngine by TID
 router.get('/:train_id', getTrainWithoutEngineByTID);
+
+// Route for retrieving all TrainsWithoutEngines by Route ID
+router.get('/route/:route_id', getTrainsByRouteID);
+
 
 module.exports = router;
