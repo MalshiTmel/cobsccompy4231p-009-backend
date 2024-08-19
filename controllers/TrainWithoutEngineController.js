@@ -1,6 +1,71 @@
 const TrainWithoutEngine = require('../models/TrainWithoutEngineModel');
+const generateRealTimeData = require('../gpsData/generateRealTimeData'); // Import the function
+const OldRecords = require('../models/OldRecords'); // Import OldRecords
 
-// Create a new TrainWithoutEngine
+/**
+ * @swagger
+ * /api/train-without-engines:
+ *   post:
+ *     summary: Create a new TrainWithoutEngine
+ *     description: Adds a new train without an engine to the database.
+ *     tags: [TrainWithoutEngines]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               TID:
+ *                 type: string
+ *                 description: Train ID.
+ *               TName:
+ *                 type: string
+ *                 description: Train Name.
+ *               RID:
+ *                 type: string
+ *                 description: Route ID.
+ *               Stops:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: List of stops for the train.
+ *     responses:
+ *       201:
+ *         description: TrainWithoutEngine successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: Unique identifier of the train.
+ *                 TID:
+ *                   type: string
+ *                   description: Train ID.
+ *                 TName:
+ *                   type: string
+ *                   description: Train Name.
+ *                 RID:
+ *                   type: string
+ *                   description: Route ID.
+ *                 Stops:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: List of stops.
+ *       400:
+ *         description: Error creating train
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ */
 exports.createTrainWithoutEngine = async (req, res) => {
   const { TID, TName, RID, Stops } = req.body;
   try {
@@ -14,7 +79,87 @@ exports.createTrainWithoutEngine = async (req, res) => {
   }
 };
 
-// Update an existing TrainWithoutEngine
+/**
+ * @swagger
+ * /api/train-without-engines/{train_id}:
+ *   put:
+ *     summary: Update an existing TrainWithoutEngine
+ *     description: Updates details of an existing train without an engine.
+ *     tags: [TrainWithoutEngines]
+ *     parameters:
+ *       - in: path
+ *         name: train_id
+ *         required: true
+ *         description: The Train ID to update.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               TID:
+ *                 type: string
+ *                 description: Train ID.
+ *               TName:
+ *                 type: string
+ *                 description: Train Name.
+ *               RID:
+ *                 type: string
+ *                 description: Route ID.
+ *               Stops:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: List of stops for the train.
+ *     responses:
+ *       200:
+ *         description: TrainWithoutEngine successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: Unique identifier of the train.
+ *                 TID:
+ *                   type: string
+ *                   description: Train ID.
+ *                 TName:
+ *                   type: string
+ *                   description: Train Name.
+ *                 RID:
+ *                   type: string
+ *                   description: Route ID.
+ *                 Stops:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: List of stops.
+ *       404:
+ *         description: Train not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ *       400:
+ *         description: Error updating train
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ */
 exports.updateTrainWithoutEngine = async (req, res) => {
   const { train_id } = req.params;
   const updateFields = req.body;
@@ -35,7 +180,52 @@ exports.updateTrainWithoutEngine = async (req, res) => {
   }
 };
 
-// Delete a TrainWithoutEngine
+/**
+ * @swagger
+ * /api/train-without-engines/{train_id}:
+ *   delete:
+ *     summary: Delete a TrainWithoutEngine
+ *     description: Removes a specific train without an engine from the database.
+ *     tags: [TrainWithoutEngines]
+ *     parameters:
+ *       - in: path
+ *         name: train_id
+ *         required: true
+ *         description: The Train ID to delete.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: TrainWithoutEngine successfully deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message.
+ *       404:
+ *         description: Train not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ *       400:
+ *         description: Error deleting train
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ */
 exports.deleteTrainWithoutEngine = async (req, res) => {
   const { train_id } = req.params;
   try {
@@ -51,7 +241,51 @@ exports.deleteTrainWithoutEngine = async (req, res) => {
   }
 };
 
-// Get all TrainsWithoutEngines
+/**
+ * @swagger
+ * /api/train-without-engines:
+ *   get:
+ *     summary: Get all TrainsWithoutEngines
+ *     description: Retrieves a list of all trains without engines from the database.
+ *     tags: [TrainWithoutEngines]
+ *     responses:
+ *       200:
+ *         description: List of TrainsWithoutEngines successfully retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: Unique identifier of the train.
+ *                   TID:
+ *                     type: string
+ *                     description: Train ID.
+ *                   TName:
+ *                     type: string
+ *                     description: Train Name.
+ *                   RID:
+ *                     type: string
+ *                     description: Route ID.
+ *                   Stops:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                     description: List of stops.
+ *       400:
+ *         description: Error retrieving trains
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ */
 exports.getAllTrainsWithoutEngines = async (req, res) => {
   try {
     const trains = await TrainWithoutEngine.find();
@@ -62,7 +296,71 @@ exports.getAllTrainsWithoutEngines = async (req, res) => {
   }
 };
 
-// Get real-time data for a specific TrainWithoutEngine
+/**
+ * @swagger
+ * /api/train-without-engines/{train_id}/real-time-data:
+ *   get:
+ *     summary: Get real-time data for a specific TrainWithoutEngine
+ *     description: Retrieves real-time data for a specific train without an engine, including direction, current station, and next station.
+ *     tags: [TrainWithoutEngines]
+ *     parameters:
+ *       - in: path
+ *         name: train_id
+ *         required: true
+ *         description: The Train ID to fetch real-time data for.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Real-time data successfully retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 direction:
+ *                   type: string
+ *                   description: Current direction of the train.
+ *                 startStation:
+ *                   type: string
+ *                   description: Start station of the train.
+ *                 endStation:
+ *                   type: string
+ *                   description: End station of the train.
+ *                 startTime:
+ *                   type: string
+ *                   format: date-time
+ *                   description: Start time of the journey.
+ *                 estimatedEndTime:
+ *                   type: string
+ *                   description: Estimated end time of the journey.
+ *                 currentStation:
+ *                   type: string
+ *                   description: Current station of the train.
+ *                 nextStation:
+ *                   type: string
+ *                   description: Next station of the train.
+ *       404:
+ *         description: Train not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ *       400:
+ *         description: Error fetching real-time data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ */
 exports.getRealTimeData = async (req, res) => {
   const { train_id } = req.params;
   try {
@@ -111,7 +409,66 @@ exports.getRealTimeData = async (req, res) => {
   }
 };
 
-// Get a single TrainWithoutEngine by TID
+/**
+ * @swagger
+ * /api/train-without-engines/{train_id}:
+ *   get:
+ *     summary: Get a single TrainWithoutEngine by TID
+ *     description: Retrieves details of a specific train without an engine by its Train ID.
+ *     tags: [TrainWithoutEngines]
+ *     parameters:
+ *       - in: path
+ *         name: train_id
+ *         required: true
+ *         description: The Train ID to fetch.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: TrainWithoutEngine successfully retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: Unique identifier of the train.
+ *                 TID:
+ *                   type: string
+ *                   description: Train ID.
+ *                 TName:
+ *                   type: string
+ *                   description: Train Name.
+ *                 RID:
+ *                   type: string
+ *                   description: Route ID.
+ *                 Stops:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: List of stops.
+ *       404:
+ *         description: Train not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ *       400:
+ *         description: Error retrieving train
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ */
 exports.getTrainWithoutEngineByTID = async (req, res) => {
   const { train_id } = req.params;
   try {
@@ -127,14 +484,74 @@ exports.getTrainWithoutEngineByTID = async (req, res) => {
   }
 };
 
-// Get all TrainsWithoutEngines by Route ID (RID)
+/**
+ * @swagger
+ * /api/train-without-engines/by-route/{route_id}:
+ *   get:
+ *     summary: Get all TrainsWithoutEngines by Route ID
+ *     description: Retrieves a list of all trains without engines for a specific route ID.
+ *     tags: [TrainWithoutEngines]
+ *     parameters:
+ *       - in: path
+ *         name: route_id
+ *         required: true
+ *         description: The Route ID to fetch trains for.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of TrainsWithoutEngines successfully retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: Unique identifier of the train.
+ *                   TID:
+ *                     type: string
+ *                     description: Train ID.
+ *                   TName:
+ *                     type: string
+ *                     description: Train Name.
+ *                   RID:
+ *                     type: string
+ *                     description: Route ID.
+ *                   Stops:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                     description: List of stops.
+ *       404:
+ *         description: No trains found for this route ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ *       400:
+ *         description: Error retrieving trains
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ */
 exports.getTrainsByRouteID = async (req, res) => {
     const { route_id } = req.params;
     try {
       const trains = await TrainWithoutEngine.find({ RID: route_id });
       if (trains.length === 0) {
-        console.warn('No trains found for route:', route_id);
-        return res.status(404).json({ error: 'No trains found for this route' });
+        return res.status(404).json({ error: 'No trains found for this route ID' });
       }
       res.json(trains);
     } catch (error) {
@@ -142,4 +559,3 @@ exports.getTrainsByRouteID = async (req, res) => {
       res.status(400).json({ error: 'Unable to retrieve trains' });
     }
   };
-  

@@ -1,4 +1,3 @@
-// routes/TrainWithEngineRoute.js
 const express = require('express');
 const router = express.Router();
 const {
@@ -10,25 +9,273 @@ const {
   fetchTrainWithEngineByTID
 } = require('../controllers/TrainWithEngineController');
 
-// Create a new TrainWithEngine
+/**
+ * @swagger
+ * tags:
+ *   name: TrainWithEngines
+ *   description: API endpoints for managing trains with engines.
+ */
+
+/**
+ * @swagger
+ * /train-with-engines:
+ *   post:
+ *     summary: Create a new TrainWithEngine
+ *     tags: [TrainWithEngines]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TrainWithEngine'
+ *     responses:
+ *       201:
+ *         description: TrainWithEngine created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TrainWithEngine'
+ *       400:
+ *         description: Invalid input data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ */
 router.post('/', createTrainWithEngine);
 
-// Unassign engine (set EID to 'unassigned')
+/**
+ * @swagger
+ * /train-with-engines/unassign/{fulltrain_id}:
+ *   patch:
+ *     summary: Unassign engine from a TrainWithEngine
+ *     tags: [TrainWithEngines]
+ *     parameters:
+ *       - in: path
+ *         name: fulltrain_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the TrainWithEngine to unassign
+ *     responses:
+ *       200:
+ *         description: Engine unassigned successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *       404:
+ *         description: TrainWithEngine not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ */
 router.patch('/unassign/:fulltrain_id', removeTrainFromEngine);
 
-// Modify a TrainWithEngine (update by TID)
+/**
+ * @swagger
+ * /train-with-engines/{fulltrain_id}:
+ *   patch:
+ *     summary: Modify an existing TrainWithEngine
+ *     tags: [TrainWithEngines]
+ *     parameters:
+ *       - in: path
+ *         name: fulltrain_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the TrainWithEngine to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TrainWithEngine'
+ *     responses:
+ *       200:
+ *         description: TrainWithEngine updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TrainWithEngine'
+ *       400:
+ *         description: Invalid input data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ *       404:
+ *         description: TrainWithEngine not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ */
 router.patch('/:fulltrain_id', modifyTrainWithEngine);
 
-// Retrieve all TrainWithEngines
+/**
+ * @swagger
+ * /train-with-engines:
+ *   get:
+ *     summary: Retrieve all TrainWithEngines
+ *     tags: [TrainWithEngines]
+ *     responses:
+ *       200:
+ *         description: A list of TrainWithEngines
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/TrainWithEngine'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ */
 router.get('/', fetchAllTrainWithEngines);
 
-// Retrieve a single TrainWithEngine by ID
+/**
+ * @swagger
+ * /train-with-engines/{fulltrain_id}:
+ *   get:
+ *     summary: Retrieve a specific TrainWithEngine by ID
+ *     tags: [TrainWithEngines]
+ *     parameters:
+ *       - in: path
+ *         name: fulltrain_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the TrainWithEngine to retrieve
+ *     responses:
+ *       200:
+ *         description: A specific TrainWithEngine
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TrainWithEngine'
+ *       404:
+ *         description: TrainWithEngine not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ */
 router.get('/:fulltrain_id', fetchTrainWithEngineById);
 
-// Retrieve a single TrainWithEngine by TID
+/**
+ * @swagger
+ * /train-with-engines/tid/{tid}:
+ *   get:
+ *     summary: Retrieve a specific TrainWithEngine by TID
+ *     tags: [TrainWithEngines]
+ *     parameters:
+ *       - in: path
+ *         name: tid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The TID of the TrainWithEngine to retrieve
+ *     responses:
+ *       200:
+ *         description: A specific TrainWithEngine
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TrainWithEngine'
+ *       404:
+ *         description: TrainWithEngine not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ */
 router.get('/tid/:tid', fetchTrainWithEngineByTID);
-
-// Modify a TrainWithEngine (update by TID)
-router.patch('/:fulltrain_id', modifyTrainWithEngine);
 
 module.exports = router;
