@@ -10,7 +10,14 @@ const formatTime = (date) => {
   return `${hours}:${minutes}:${seconds}`;
 };
 
-const calculateCurrentLocation = (startTime, duration, currentTime, stops) => {
+const getRandomIndex = (length) => Math.floor(Math.random() * length);
+
+const calculateNextStation = (currentIndex, stops) => {
+  const nextIndex = currentIndex + 1;
+  return nextIndex < stops.length ? stops[nextIndex] : 'End of Route';
+};
+
+const calculateCurrentLocation = (startTime, duration, currentTime, stops, direction) => {
   const elapsedMilliseconds = currentTime - startTime;
   const totalDurationMilliseconds = duration * 60 * 1000; // Convert duration to milliseconds
   const elapsedMinutes = Math.floor(elapsedMilliseconds / (1000 * 60)); // Elapsed time in minutes
@@ -19,10 +26,13 @@ const calculateCurrentLocation = (startTime, duration, currentTime, stops) => {
   const stopDuration = Math.floor(duration / stopCount); // Duration per stop in minutes
 
   const currentIndex = Math.floor(elapsedMinutes / stopDuration);
-  const nextIndex = currentIndex + 1;
+  const adjustedStops = direction === 'Downward' ? stops.slice().reverse() : stops;
 
-  const currentStation = stops[currentIndex] || 'End of Route';
-  const nextStation = stops[nextIndex] || 'End of Route';
+  const validCurrentIndex = Math.min(Math.max(currentIndex, 0), adjustedStops.length - 1);
+  const validNextIndex = Math.min(Math.max(validCurrentIndex + 1, 0), adjustedStops.length - 1);
+
+  const currentStation = adjustedStops[validCurrentIndex] || 'End of Route';
+  const nextStation = adjustedStops[validNextIndex] || 'End of Route';
 
   return { currentStation, nextStation };
 };
@@ -54,36 +64,45 @@ const generateRealTimeData = async (engineId) => {
       await trainWithEngine.save(); // Save the direction
     }
 
-    const isUpward = trainWithEngine.direction === 'Upward';
-    if (!isUpward) {
-      // Reverse the stops array for downward direction
-      Stops = Stops.slice().reverse();
-    }
-
-    const totalDuration = 700; // Total trip duration in minutes
+    const direction = trainWithEngine.direction;
+    const isUpward = direction === 'Upward';
+    const adjustedStops = direction === 'Downward' ? Stops.slice().reverse() : Stops;
 
     // Generate a random start time within the last 24 hours
     const startTime = generateRandomStartTime();
-    const endTime = new Date(startTime.getTime() + totalDuration * 60 * 1000); // End time 700 minutes later
+    const endTime = new Date(startTime.getTime() + 700 * 60 * 1000); // End time 700 minutes later
 
     // Get current time in Sri Lanka time zone
     const sriLankaTimeOffset = 5.5 * 60 * 60 * 1000; // Sri Lanka is UTC+5:30
     const currentTime = new Date(Date.now() + sriLankaTimeOffset); // Adjust current time to Sri Lankan time
 
-    const { currentStation, nextStation } = calculateCurrentLocation(startTime, totalDuration, currentTime, Stops);
+    // Determine if this is the first load or subsequent update
+    const isFirstLoad = Math.abs(currentTime - startTime) < 60 * 1000; // Within 1 minute of start time
+
+    // Randomly select current station and determine next station
+    let currentStation, nextStation;
+    if (isFirstLoad) {
+      const startIndex = direction === 'Upward' ? 0 : adjustedStops.length - 1;
+      currentStation = adjustedStops[startIndex];
+      nextStation = calculateNextStation(startIndex, adjustedStops);
+    } else {
+      const randomIndex = getRandomIndex(adjustedStops.length);
+      currentStation = adjustedStops[randomIndex];
+      nextStation = calculateNextStation(randomIndex, adjustedStops);
+    }
 
     const formattedStartTime = formatTime(startTime);
     const formattedEndTime = formatTime(endTime);
 
-    // Simulate the updates every minute with a change every 30 minutes
-    const updateInterval = Math.floor(Math.random() * (30 - 15 + 1) + 15) * 60 * 1000; // 15-30 minutes
-    const lastUpdate = new Date(startTime.getTime() + updateInterval);
+    // Simulate the updates every 30 seconds
+    const updateInterval = 30 * 1000; // 30 seconds
+    const lastUpdate = new Date(currentTime.getTime() + updateInterval);
 
     // Create a new OldRecords entry
     const oldRecord = new OldRecords({
       EID: engineId,
-      currentIndex: Stops.indexOf(currentStation),
-      direction: trainWithEngine.direction,
+      currentIndex: adjustedStops.indexOf(currentStation),
+      direction,
       startTime: startTime,
       lastStationUpdate: lastUpdate
     });
@@ -92,12 +111,12 @@ const generateRealTimeData = async (engineId) => {
     await oldRecord.save();
 
     return {
-      direction: trainWithEngine.direction,
-      startStation: Stops[0],
-      endStation: Stops[Stops.length - 1],
+      direction,
+      startStation: adjustedStops[0],
+      endStation: adjustedStops[adjustedStops.length - 1],
       startTime: formattedStartTime,
       estimatedEndTime: formattedEndTime,
-      currentStation,
+      currentStation, // Ensure the correct currentStation is used
       nextStation,
       lastUpdate
     };
